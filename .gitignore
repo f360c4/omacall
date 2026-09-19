@@ -1,0 +1,60 @@
+# --- planejamento e notas de desenvolvimento (nunca versionar) ---
+planning/
+notes/
+scratch/
+*.draft.md
+*.local.md
+TODO.md
+
+# --- build do daemon e do pjproject ---
+daemon/third_party/
+daemon/src/*.o
+daemon/src/*.d
+daemon/cli/*.o
+daemon/omacalld
+daemon/omacall
+daemon/build/
+.qmllint/
+*.a
+*.so
+*.pc
+
+# --- makepkg ---
+packaging/pkg/
+packaging/src/
+packaging/*.tar.gz
+packaging/*.pkg.tar.*
+packaging/*.log
+
+# --- agentes: nada disso entra no repo, nunca ---
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+GEMINI.md
+.claude/
+.codex/
+.cursor/
+.cursorrules
+.windsurfrules
+.aider*
+.opencode/
+
+# --- editores ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- segredos e capturas de teste ---
+config.json
+*.pcap
+*.pcapng
+.env
+.env.*
+
+# --- logs e temporários ---
+*.log
+*.tmp
+core
+core.*

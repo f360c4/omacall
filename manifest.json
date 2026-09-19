@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "id": "f360c4.omacall",
+  "name": "Omacall",
+  "version": "0.1.0",
+  "author": "Luiz Felipe - F360c4",
+  "license": "GPL-3.0-or-later",
+  "description": "SIP softphone for the Omarchy bar: one account, calls in and out, DTMF, contacts and history. G.729 and Opus.",
+  "kinds": [
+    "service",
+    "bar-widget"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Omacall",
+    "description": "SIP phone: call, answer, DTMF, contacts, history",
+    "category": "Network",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "showLabel": false,
+      "openOnIncoming": true,
+      "language": "auto"
+    },
+    "schema": [
+      {
+        "key": "showLabel",
+        "type": "boolean",
+        "label": "Show call timer next to the icon",
+        "defaultValue": false,
+        "description": "While a call is connected, show its duration as mm:ss beside the phone icon in the bar."
+      },
+      {
+        "key": "openOnIncoming",
+        "type": "boolean",
+        "label": "Open the panel on an incoming call",
+        "defaultValue": true,
+        "description": "Pop the panel open by itself when a call comes in, so answering is one click away."
+      },
+      {
+        "key": "language",
+        "type": "enum",
+        "label": "Language",
+        "options": [
+          "auto",
+          "en",
+          "pt-BR",
+          "es",
+          "it",
+          "fr",
+          "de",
+          "ja"
+        ],
+        "defaultValue": "auto",
+        "description": "Language of the panel. Auto follows the LANG environment variable and falls back to English."
+      }
+    ]
+  }
+}
