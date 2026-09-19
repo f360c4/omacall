@@ -1,0 +1,82 @@
+# Maintainer: Luiz Felipe - F360c4 <f360c4@gmail.com>
+
+pkgname=omacall
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='SIP softphone daemon and CLI for the Omarchy Omacall plugin (G.729, Opus, G.711, UDP)'
+arch=(x86_64 aarch64)
+url='https://github.com/f360c4/omacall'
+license=(GPL-3.0-or-later)
+# pjproject is built here and linked statically; everything below is a shared
+# library the resulting binary loads at runtime.
+depends=(alsa-lib bcg729 cjson libsamplerate openssl opus util-linux-libs)
+makedepends=(git pkgconf)
+
+_pjver=2.17
+source=("git+$url.git#tag=v$pkgver"
+        "pjproject-$_pjver.tar.gz::https://github.com/pjsip/pjproject/archive/$_pjver.tar.gz")
+sha256sums=('SKIP'
+            '065fe06c06788d97c35f563796d59f00ce52fe9558a52d7b490a042a966facce')
+
+build() {
+  cd "$srcdir/pjproject-$_pjver"
+
+  # Audio only, static, G.729 + Opus + G.711.
+  #
+  # SSL is left enabled because SIP over TLS is supported; that is what pulls
+  # in openssl above.
+  #
+  # Three things that look wrong but are not: there is no --disable-shared
+  # (static is already the default; the flag that exists is --enable-shared);
+  # bcg729 is autodetected, and --with-bcg729 without a directory would only
+  # get in the way; and --disable-speex-codec has to travel with
+  # --disable-speex-aec, or echo_common.o is left referencing speex_aec_*
+  # symbols that no longer exist and the link fails.
+  ./configure --prefix=/usr \
+    --enable-epoll --enable-libsamplerate \
+    --disable-video --disable-ffmpeg --disable-v4l2 --disable-openh264 \
+    --disable-vpx --disable-sdl --disable-libyuv \
+    --disable-opencore-amr --disable-silk --disable-g7221-codec \
+    --disable-ilbc-codec --disable-speex-codec --disable-speex-aec \
+    --disable-gsm-codec
+
+  # config_site.h carries the two choices no configure flag expresses: the
+  # WebRTC echo canceller (built, but off by default) and no video.
+  install -Dm644 "$srcdir/omacall/packaging/config_site.h" \
+    pjlib/include/pj/config_site.h
+
+  make dep
+  # `make lib`, not `make`: the default target also builds pjsua, pjsystest and
+  # every sample and test program in pjsip-apps, which this package does not
+  # install and nobody waiting on an install wants to compile. LIB_DIRS is what
+  # the daemon links against.
+  make lib
+
+  # G.729 is the reason this package builds pjproject itself instead of using
+  # the one in the AUR. If it did not make it in, stop here rather than ship a
+  # binary that quietly negotiates G.711 for the rest of its life.
+  #
+  # The test is the wrapper's undefined reference to libbcg729, not its own
+  # symbols: makepkg builds with -flto, and under LTO the object carries GIMPLE
+  # bytecode, so nm shows none of the functions defined inside it. An undefined
+  # reference to another library survives either way.
+  local _codeclib
+  _codeclib=$(echo pjmedia/lib/libpjmedia-codec-*.a)
+  if ! ar t "$_codeclib" | grep -qx 'bcg729.o' \
+     || ! nm "$_codeclib" 2>/dev/null | grep -q 'U bcg729Encoder'; then
+    echo "error: pjproject was built without bcg729, G.729 would be missing" >&2
+    return 1
+  fi
+
+  cd "$srcdir/omacall/daemon"
+  make PJDIR="$srcdir/pjproject-$_pjver"
+}
+
+package() {
+  cd "$srcdir/omacall/daemon"
+  make DESTDIR="$pkgdir" PREFIX=/usr PJDIR="$srcdir/pjproject-$_pjver" install
+  install -Dm644 "$srcdir/omacall/LICENSE" \
+    "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 "$srcdir/omacall/config.json.example" \
+    "$pkgdir/usr/share/doc/$pkgname/config.json.example"
+}
