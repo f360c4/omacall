@@ -1,0 +1,70 @@
+{
+  "version": 1,
+
+  "_accounts": "Several servers can be configured; only the one named by active_account registers. A file with a single \"account\" object and no list still works and is read as one account called Default.",
+  "accounts": [
+    {
+      "name": "Work",
+      "display_name": "Your Name",
+      "username": "1001",
+      "password": "your-sip-password",
+      "domain": "pbx.example.com",
+      "port": 5060,
+      "transport": "udp",
+      "register_expires": 300
+    },
+    {
+      "name": "Work over TLS",
+      "display_name": "Your Name",
+      "username": "1001",
+      "password": "your-sip-password",
+      "domain": "pbx.example.com",
+      "port": 5061,
+      "transport": "tls",
+      "register_expires": 300,
+      "tls": { "verify_server": true, "ca_file": "" }
+    }
+  ],
+  "active_account": "Work",
+
+  "_account": "The legacy single-account form, still read when there is no accounts list",
+  "account": {
+    "display_name": "Your Name",
+    "username": "1001",
+    "auth_username": "",
+    "password": "your-sip-password",
+    "domain": "pbx.example.com",
+    "proxy": "",
+    "port": 5060,
+    "register_expires": 300,
+    "_transport": "udp or tls. With tls, port defaults to 5061 unless you set another one",
+    "transport": "udp"
+  },
+
+  "_tls": "only read when account.transport is tls",
+  "tls": {
+    "_verify_server": "false accepts any certificate — for a lab with a self-signed one. It means someone between you and the PBX can impersonate it",
+    "verify_server": true,
+    "_ca_file": "a CA bundle, when the server certificate is not signed by anything the system store knows. Empty uses the system store",
+    "ca_file": ""
+  },
+
+  "codecs": ["G729/8000", "opus/48000", "PCMA/8000", "PCMU/8000"],
+
+  "audio": {
+    "capture": "default",
+    "playback": "default",
+    "echo_cancel": true,
+    "ring_volume": 0.8
+  },
+
+  "nat": {
+    "stun_server": "stun.l.google.com:19302",
+    "keepalive_sec": 15
+  },
+
+  "_dtmf_method": "rfc4733 | rfc2833 | info | inband — rfc2833 and rfc4733 are the same mechanism, RFC 4733 being the revision that obsoleted RFC 2833",
+  "dtmf_method": "rfc4733",
+  "ring_timeout_sec": 45,
+  "log_level": 3
+}

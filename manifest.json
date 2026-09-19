@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "author": "Luiz Felipe - F360c4",
   "license": "GPL-3.0-or-later",
-  "description": "SIP softphone for the Omarchy bar: one account, calls in and out, DTMF, contacts and history. G.729 and Opus.",
+  "description": "SIP softphone for the Omarchy bar: calls in and out, DTMF, contacts and history, over UDP or TLS. G.729, Opus and G.711, several accounts to switch between, and an interface in seven languages.",
   "kinds": [
     "service",
     "bar-widget"
@@ -17,7 +17,7 @@
   },
   "barWidget": {
     "displayName": "Omacall",
-    "description": "SIP phone: call, answer, DTMF, contacts, history",
+    "description": "SIP phone: call, answer, DTMF, contacts, history. English, Portuguese, Spanish, Italian, French, German, Japanese",
     "category": "Network",
     "allowMultiple": false,
     "defaultSection": "right",

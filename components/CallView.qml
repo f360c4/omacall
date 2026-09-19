@@ -57,7 +57,7 @@ Column {
 
   Column {
     width: parent.width
-    spacing: Style.space(2)
+    spacing: Style.space(1)
 
     Text {
       width: parent.width
@@ -80,10 +80,14 @@ Column {
       elide: Text.ElideRight
     }
 
+    // Three pieces of one sentence — the state, how long, over what — so they
+    // sit on a shared baseline. A Row aligns its children by the top, which
+    // leaves the smaller codec floating above the line instead of on it.
     Row {
       spacing: Style.space(8)
 
       Text {
+        id: stateLabel
         textFormat: Text.PlainText
         text: root.subtitle
         color: root.incoming ? root.urgent : root.accent
@@ -92,6 +96,7 @@ Column {
       }
 
       Text {
+        anchors.baseline: stateLabel.baseline
         visible: root.connected
         textFormat: Text.PlainText
         text: Model.duration(root.elapsed)
@@ -101,6 +106,7 @@ Column {
       }
 
       Text {
+        anchors.baseline: stateLabel.baseline
         visible: root.connected && root.call && root.call.codec
         textFormat: Text.PlainText
         text: root.call && root.call.codec ? root.call.codec : ""
@@ -150,6 +156,10 @@ Column {
   }
 
   Dialpad {
+    // A Column lays its children out on the left edge. The keypad is the one
+    // thing here that is a block rather than a line of text, so it has to be
+    // centred explicitly or it sits off to one side of the panel.
+    anchors.horizontalCenter: parent.horizontalCenter
     visible: root.connected
     foreground: root.foreground
     fontFamily: root.fontFamily

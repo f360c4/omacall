@@ -243,15 +243,12 @@ Panel {
             }
           }
 
-          Text {
+          InstallHelp {
             width: parent.width
             visible: root.statusKey === "daemonMissing"
-            textFormat: Text.PlainText
-            text: i18n.t("panel.hint.installDaemon")
-            color: Qt.darker(root.foreground, 1.4)
-            font.family: root.fontFamily
-            font.pixelSize: root.fontTokens.body
-            wrapMode: Text.WordWrap
+            i18n: i18n
+            foreground: root.foreground
+            fontFamily: root.fontFamily
           }
 
           Text {
