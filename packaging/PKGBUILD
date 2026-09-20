@@ -13,9 +13,26 @@ depends=(alsa-lib bcg729 cjson libsamplerate openssl opus util-linux-libs)
 makedepends=(git pkgconf)
 
 _pjver=2.17
-source=("git+$url.git#tag=v$pkgver"
+
+# The source is a published release tarball, verified by checksum — not a Git
+# tag. A tag is a movable label: pointing it somewhere else later would make a
+# future makepkg build and install something other than what was reviewed, and
+# nothing would notice. An archive pinned by sha256 cannot change under you.
+#
+# It is also not GitHub's generated /archive/<ref>.tar.gz, which GitHub builds
+# on demand and does not promise to be byte-identical over time; a change there
+# would break every install at once.
+#
+# The tarball is `git archive` of the commit below, which anyone can reproduce
+# and compare against the checksum:
+#
+#   git archive --format=tar --prefix=omacall-{VERSION}/ <commit> \
+#     | gzip -n -9 | sha256sum
+#
+_commit=ab5d61899d824dec0f9f37da4185e9a7f0422ce3
+source=("$pkgname-$pkgver.tar.gz::$url/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz"
         "pjproject-$_pjver.tar.gz::https://github.com/pjsip/pjproject/archive/$_pjver.tar.gz")
-sha256sums=('SKIP'
+sha256sums=('69eea20ba1c25aec5ebec6aed9cdee1f2498a5e344a3780dfbb7d6918c115b11'
             '065fe06c06788d97c35f563796d59f00ce52fe9558a52d7b490a042a966facce')
 
 build() {
@@ -42,7 +59,7 @@ build() {
 
   # config_site.h carries the two choices no configure flag expresses: the
   # WebRTC echo canceller (built, but off by default) and no video.
-  install -Dm644 "$srcdir/omacall/packaging/config_site.h" \
+  install -Dm644 "$srcdir/$pkgname-$pkgver/packaging/config_site.h" \
     pjlib/include/pj/config_site.h
 
   make dep
@@ -68,15 +85,15 @@ build() {
     return 1
   fi
 
-  cd "$srcdir/omacall/daemon"
+  cd "$srcdir/$pkgname-$pkgver/daemon"
   make PJDIR="$srcdir/pjproject-$_pjver"
 }
 
 package() {
-  cd "$srcdir/omacall/daemon"
+  cd "$srcdir/$pkgname-$pkgver/daemon"
   make DESTDIR="$pkgdir" PREFIX=/usr PJDIR="$srcdir/pjproject-$_pjver" install
-  install -Dm644 "$srcdir/omacall/LICENSE" \
+  install -Dm644 "$srcdir/$pkgname-$pkgver/LICENSE" \
     "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
-  install -Dm644 "$srcdir/omacall/config.json.example" \
+  install -Dm644 "$srcdir/$pkgname-$pkgver/config.json.example" \
     "$pkgdir/usr/share/doc/$pkgname/config.json.example"
 }
