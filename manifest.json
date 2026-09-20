@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "f360c4.omacall",
   "name": "Omacall",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Luiz Felipe - F360c4",
   "license": "GPL-3.0-or-later",
   "description": "SIP softphone for the Omarchy bar: calls in and out, DTMF, contacts and history, over UDP or TLS. G.729, Opus and G.711, several accounts to switch between, and an interface in seven languages.",

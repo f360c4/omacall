@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-09-20
+
+### Changed
+
+- The package pins its source to a published release tarball verified by
+  sha256, instead of fetching a Git tag with the checksum skipped. A tag can be
+  moved; a checksummed archive of a known commit cannot.
+
 ## [0.1.0] - 2026-09-18
 
 ### Added
