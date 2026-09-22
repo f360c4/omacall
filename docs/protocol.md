@@ -8,6 +8,10 @@ UTF-8, with no newlines inside an object. Several clients can be connected at
 once — the panel and the CLI usually both are. Replies go only to the client
 that asked; events go to everyone.
 
+Read what you ask for. Replies and events waiting on a client are held to
+1 MiB; past 256 KiB the daemon stops reading that client's requests until it
+drains, and past the cap the client is disconnected.
+
 This document is the contract. The panel, the CLI and anything else you write
 against the socket can rely on it.
 

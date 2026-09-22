@@ -1,7 +1,7 @@
 # Maintainer: Luiz Felipe - F360c4 <f360c4@gmail.com>
 
 pkgname=omacall
-pkgver=0.1.1
+pkgver=0.1.2
 pkgrel=1
 pkgdesc='SIP softphone daemon and CLI for the Omarchy Omacall plugin (G.729, Opus, G.711, UDP)'
 arch=(x86_64 aarch64)

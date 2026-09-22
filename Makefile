@@ -18,18 +18,23 @@ QMLROOT     := .qmllint
 QMLLINT_FLAGS := --signal-handler-parameters disable
 REF_LANG    := i18n/en.json
 
-.PHONY: help check i18n-check version-check validate lint dev-install dev-uninstall
+.PHONY: help check test i18n-check version-check validate lint dev-install dev-uninstall
 
 help:
 	@echo "make check        run every check below"
 	@echo "make i18n-check   every language carries exactly the keys of en.json"
 	@echo "make version-check manifest, daemon and PKGBUILD agree on the version"
+	@echo "make test         build the daemon and run its tests (needs socat)"
 	@echo "make lint         qmllint over the plugin QML"
 	@echo "make validate     omarchy plugin validate over the installed copy"
 	@echo "make dev-install  copy this working tree to $(PLUGIN_DIR)"
 	@echo "make dev-uninstall  remove that copy"
 
 check: i18n-check version-check lint validate
+
+test:
+	@$(MAKE) -C daemon --no-print-directory
+	@daemon/tests/ipc-backpressure.sh daemon/omacalld
 
 # The version lives in three files that no tool keeps in sync. A release built
 # from mismatched ones installs a package whose binary reports a different

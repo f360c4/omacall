@@ -19,6 +19,16 @@
 #define MAX_LINE      (64 * 1024)
 #define HELLO_HISTORY 20
 
+/* Bounds on replies waiting to be written. A client that sends requests and
+ * never reads the answers would otherwise make the daemon buffer them without
+ * limit — a same-user process on the 0600 socket, or simply a script that
+ * forgot to read. Above SOFT the daemon stops reading from that client, so it
+ * stops producing for it; above HARD it gives up on the client. TOTAL caps
+ * every client together. */
+#define QUEUE_SOFT_LIMIT  (256 * 1024)
+#define QUEUE_HARD_LIMIT  (1024 * 1024)
+#define QUEUE_TOTAL_LIMIT (2 * 1024 * 1024)
+
 typedef struct {
     int    fd;
     char   in[MAX_LINE];
@@ -33,6 +43,7 @@ static int listen_fd = -1;
 static char socket_path[512];
 static client clients[MAX_CLIENTS];
 static size_t client_count;
+static size_t queued_total;   /* bytes waiting across every client */
 
 static oma_config *live_config;
 static char live_config_path[512];
@@ -55,6 +66,7 @@ static void client_close(client *c)
 {
     if (c->fd >= 0)
         close(c->fd);
+    queued_total -= c->out_len;
     free(c->out);
     memset(c, 0, sizeof(*c));
     c->fd = -1;
@@ -64,6 +76,20 @@ static void client_queue(client *c, const char *line, size_t len)
 {
     if (c->fd < 0)
         return;
+
+    if (c->out_len + len + 1 > QUEUE_HARD_LIMIT) {
+        oma_warn("ipc: client is not reading its replies (%zu bytes queued), "
+                 "dropping it", c->out_len);
+        client_close(c);
+        return;
+    }
+    if (queued_total + len + 1 > QUEUE_TOTAL_LIMIT) {
+        oma_warn("ipc: %zu bytes queued across all clients, dropping the one "
+                 "that pushed it over", queued_total);
+        client_close(c);
+        return;
+    }
+
     if (c->out_len + len + 1 > c->out_cap) {
         size_t next = c->out_cap == 0 ? 8192 : c->out_cap;
         char *grown;
@@ -82,6 +108,7 @@ static void client_queue(client *c, const char *line, size_t len)
     memcpy(c->out + c->out_len, line, len);
     c->out_len += len;
     c->out[c->out_len++] = '\n';
+    queued_total += len + 1;
 }
 
 /* Push as much of the queue as the socket accepts right now. */
@@ -103,6 +130,7 @@ static void client_flush(client *c)
         }
         memmove(c->out, c->out + sent, c->out_len - (size_t)sent);
         c->out_len -= (size_t)sent;
+        queued_total -= (size_t)sent;
     }
 }
 
@@ -896,7 +924,11 @@ size_t oma_ipc_pollfds(struct pollfd *fds, size_t cap)
         if (clients[i].fd < 0)
             continue;
         fds[used].fd = clients[i].fd;
-        fds[used].events = POLLIN | (clients[i].out_len > 0 ? POLLOUT : 0);
+        /* Past the soft limit the client is not draining what it already
+         * asked for; reading more from it would only produce more. Leave
+         * POLLIN off until the queue comes back down. */
+        fds[used].events = (clients[i].out_len > QUEUE_SOFT_LIMIT ? 0 : POLLIN)
+                         | (clients[i].out_len > 0 ? POLLOUT : 0);
         fds[used].revents = 0;
         used++;
     }

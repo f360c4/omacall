@@ -10,7 +10,7 @@ include $(PJDIR)/build.mak
 
 # Must match manifest.json and packaging/PKGBUILD; `make version-check` in the
 # repository root fails when they drift apart.
-VERSION := 0.1.1
+VERSION := 0.1.2
 
 PREFIX  ?= /usr
 DESTDIR ?=

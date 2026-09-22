@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-09-23
+
+### Fixed
+
+- A client that sent requests without reading the replies could make the
+  daemon buffer them without limit. Replies waiting on a client are now capped
+  at 1 MiB (2 MiB across all clients); past 256 KiB the daemon stops reading
+  from that client until it drains, and past the cap it drops it.
+  `make test` floods a non-reading client and checks that memory stays flat.
+
 ## [0.1.1] - 2026-09-20
 
 ### Changed
