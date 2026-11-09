@@ -29,10 +29,10 @@ _pjver=2.17
 #   git archive --format=tar --prefix=omacall-{VERSION}/ <commit> \
 #     | gzip -n -9 | sha256sum
 #
-_commit=5bcc6d6196099e382d0c1cd5c71b5c477aa90a9d
+_commit=da8d2b53ed7b09f8b82f8d3aacd93af2666e7cf8
 source=("$pkgname-$pkgver.tar.gz::$url/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz"
         "pjproject-$_pjver.tar.gz::https://github.com/pjsip/pjproject/archive/$_pjver.tar.gz")
-sha256sums=('fd83dc534d21a03f8ac2dd62cfa9dfcc93781bd2c9c4ebf14e631d29f3f5f130'
+sha256sums=('70d31151f309551b294989ea56dd92ba51140d663da643da1024efaa41c16274'
             '065fe06c06788d97c35f563796d59f00ce52fe9558a52d7b490a042a966facce')
 
 build() {
