@@ -70,7 +70,7 @@ lint:
 	@mkdir -p $(QMLROOT)
 	@ln -sfn "$(OMARCHY_PATH)/shell" $(QMLROOT)/qs
 	@$(QMLLINT) $(QMLLINT_FLAGS) -I $(QMLROOT) -I "$(OMARCHY_PATH)/shell" \
-	    I18n.qml Service.qml BarWidget.qml components/*.qml
+	    OmacallI18n.qml Service.qml BarWidget.qml components/*.qml
 	@echo "qmllint: clean"
 
 validate:

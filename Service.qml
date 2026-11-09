@@ -61,7 +61,7 @@ Item {
 
   signal incomingCall(var call)
 
-  property I18n i18n: I18n {}
+  property OmacallI18n i18n: OmacallI18n {}
 
   // ------------------------------------------------------------ requests
 

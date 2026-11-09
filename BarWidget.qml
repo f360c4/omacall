@@ -52,7 +52,7 @@ Panel {
   property string dialed: ""
   property int callElapsed: 0
 
-  I18n {
+  OmacallI18n {
     id: i18n
     language: root.setting("language", "auto")
   }

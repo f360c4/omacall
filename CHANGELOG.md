@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- The bar widget failed to load on current Omarchy with "Composite Singleton
+  Type I18n is not creatable": Omarchy now ships an `I18n` singleton in
+  `qs.Commons`, which shadowed the plugin's own `I18n.qml`. The plugin's
+  dictionary is renamed to `OmacallI18n.qml`.
+
 ## [0.1.2] - 2026-09-23
 
 ### Fixed
